@@ -88,3 +88,6 @@ def draw_kps(image_pil, kps, color_list=[(255,0,0), (0,255,0), (0,0,255), (255,2
 
     out_img_pil = Image.fromarray(out_img.astype(np.uint8))
     return out_img_pil
+
+def escape_path_for_url(path):
+    return path.replace("\\", "/")
