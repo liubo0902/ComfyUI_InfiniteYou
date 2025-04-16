@@ -69,8 +69,8 @@ class IDEmbeddingModelLoader:
 
     def get_image_proj_names():
         names = [
-            os.path.join('sim_stage1", "image_proj_model.bin'),
-            os.path.join('aes_stage2", "image_proj_model.bin'),
+            os.path.join("sim_stage1", "image_proj_model.bin"),
+            os.path.join("aes_stage2", "image_proj_model.bin"),
             *folder_paths.get_filename_list("infinite_you"),
         ]
         return list(filter(lambda x: x.endswith(".bin"), list(set(names))))
