@@ -25,7 +25,7 @@ import shutil
 from facexlib.recognition import init_recognition_model
 from insightface.app import FaceAnalysis
 
-from .utils import extract_arcface_bgr_embedding, tensor_to_np_image, np_image_to_tensor, resize_and_pad_pil_image, draw_kps
+from .utils import extract_arcface_bgr_embedding, tensor_to_np_image, np_image_to_tensor, resize_and_pad_pil_image, draw_kps, escape_path_for_url
 from .infuse_net import load_infuse_net_flux
 from .resampler import Resampler
 
@@ -69,8 +69,8 @@ class IDEmbeddingModelLoader:
 
     def get_image_proj_names():
         names = [
-            'sim_stage1/image_proj_model.bin',
-            'aes_stage2/image_proj_model.bin',
+            os.path.join("sim_stage1", "image_proj_model.bin"),
+            os.path.join("aes_stage2", "image_proj_model.bin"),
             *folder_paths.get_filename_list("infinite_you"),
         ]
         return list(filter(lambda x: x.endswith(".bin"), list(set(names))))
@@ -92,7 +92,7 @@ class IDEmbeddingModelLoader:
             os.makedirs(dst_dir, exist_ok=True)
 
             downloaded_file = hf_hub_download(repo_id="ByteDance/InfiniteYou", 
-                            filename=os.path.join("infu_flux_v1.0", image_proj_model_name),
+                            filename=escape_path_for_url(os.path.join("infu_flux_v1.0", image_proj_model_name)),
                             local_dir=infinite_you_dir)
             shutil.move(downloaded_file, image_proj_model_path)
 
@@ -150,7 +150,7 @@ class ExtractFacePoseImage:
     def extract_face_pose(self, face_detector, image, width, height):
         np_image = tensor_to_np_image(image)[0]
 
-        pil_image = resize_and_pad_pil_image(Image.fromarray(np_image), (height, width))        
+        pil_image = resize_and_pad_pil_image(Image.fromarray(np_image), (width, height))        
         face_info = face_detector(cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR))
         if len(face_info) == 0:
             raise ValueError('No face detected in the input pose image')
@@ -207,10 +207,10 @@ class InfuseNetLoader:
 
     def get_controlnet_names():
         names = [
-            "sim_stage1/infusenet_sim_bf16.safetensors",
-            "sim_stage1/infusenet_sim_fp8e4m3fn.safetensors",
-            "aes_stage2/infusenet_aes_bf16.safetensors",
-            "aes_stage2/infusenet_aes_fp8e4m3fn.safetensors",
+            os.path.join("sim_stage1", "infusenet_sim_bf16.safetensors"),
+            os.path.join("sim_stage1", "infusenet_sim_fp8e4m3fn.safetensors"),
+            os.path.join("aes_stage2", "infusenet_aes_bf16.safetensors"),
+            os.path.join("aes_stage2", "infusenet_aes_fp8e4m3fn.safetensors"),
             *folder_paths.get_filename_list("infinite_you"),
         ]
         return list(filter(lambda x: x.endswith(".safetensors"), list(set(names))))
@@ -228,7 +228,7 @@ class InfuseNetLoader:
             dst_dir = os.path.dirname(controlnet_path)
             os.makedirs(dst_dir, exist_ok=True)
             downloaded_file = hf_hub_download(repo_id="ByteDance/InfiniteYou", 
-                            filename=os.path.join("infu_flux_v1.0", controlnet_name),
+                            filename=escape_path_for_url(os.path.join("infu_flux_v1.0", controlnet_name)),
                             local_dir=infinite_you_dir)
             
             shutil.move(downloaded_file, controlnet_path)
