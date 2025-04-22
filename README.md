@@ -44,6 +44,9 @@ cd ComfyUI_InfiniteYou
 pip install -r requirements.txt
 ```
 
+* Our InfiniteYou node has been added to the official Comfy Registry to ease installation: https://registry.comfy.org/publishers/yuminjia/nodes/infiniteyou. Therefore, you can also search `ComfyUI_InfiniteYou` in the ComfyUI Node Manager to install this official node.
+
+
 ### Memory Requirements
 
 The full-performance BF16 model inference requires a peak VRAM of around **43GB**. Running with FP8 precision requires a peak VRAM of around **24GB**.
