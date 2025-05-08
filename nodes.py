@@ -21,6 +21,7 @@ from PIL import Image
 import comfy
 from huggingface_hub import snapshot_download, hf_hub_download
 import shutil
+import glob
 
 from facexlib.recognition import init_recognition_model
 from insightface.app import FaceAnalysis
@@ -79,10 +80,10 @@ class IDEmbeddingModelLoader:
         insight_facedir = os.path.join(folder_paths.models_dir, "insightface")
 
         # Download insightface models
-        if not os.path.exists(insight_facedir) or len(os.listdir(insight_facedir)) == 0:
-            dst_dir = os.path.join(folder_paths.models_dir, 'insightface', 'models', 'antelopev2')
-            os.makedirs(dst_dir, exist_ok=True)
-            snapshot_download(repo_id="MonsterMMORPG/tools", allow_patterns="*.onnx", local_dir=dst_dir)
+        antelopev2_dir = os.path.join(insight_facedir, 'models', 'antelopev2')
+        if not os.path.exists(antelopev2_dir) or len(glob.glob(os.path.join(antelopev2_dir, "*.onnx"))) == 0:
+            os.makedirs(antelopev2_dir, exist_ok=True)
+            snapshot_download(repo_id="MonsterMMORPG/tools", allow_patterns="*.onnx", local_dir=antelopev2_dir)
 
         # Download infinite you models
         infinite_you_dir = os.path.join(folder_paths.models_dir, "infinite_you")
