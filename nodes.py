@@ -141,6 +141,9 @@ class ExtractFacePoseImage:
                 "image": ("IMAGE", ),
                 "width": ("INT", {"default": 864, "min": 0, "max": 2048, "step": 1}),
                 "height": ("INT", {"default": 1152, "min": 0, "max": 2048, "step": 1}),
+            },
+            "optional": {
+                "mask": ("MASK", ),
             }
         }
     
@@ -148,8 +151,14 @@ class ExtractFacePoseImage:
     FUNCTION = "extract_face_pose"
     CATEGORY = "infinite_you"
 
-    def extract_face_pose(self, face_detector, image, width, height):
+    def extract_face_pose(self, face_detector, image, width, height, mask = None):
         np_image = tensor_to_np_image(image)[0]
+        if mask is not None:
+            np_mask = tensor_to_np_image(mask)[0]
+            np_mask = cv2.resize(np_mask, (np_image.shape[1], np_image.shape[0]), interpolation=cv2.INTER_NEAREST)
+            mask_3ch = np.expand_dims(np_mask, axis=-1)
+            mask_3ch = np.repeat(mask_3ch, 3, axis=-1)  # Shape: (H, W, 3)
+            np_image = np_image * mask_3ch
 
         pil_image = resize_and_pad_pil_image(Image.fromarray(np_image), (width, height))        
         face_info = face_detector(cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR))
@@ -241,7 +250,6 @@ class InfuseNetApply:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {"positive": ("CONDITIONING", ),
-                             "negative": ("CONDITIONING", ),
                              "id_embedding": ("CONDITIONING", ),
                              "control_net": ("CONTROL_NET", ),
                              "image": ("IMAGE", ),
@@ -249,7 +257,10 @@ class InfuseNetApply:
                              "start_percent": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.001}),
                              "end_percent": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.001})
                              },
-                "optional": {"vae": ("VAE", ),
+                "optional": {
+                             "negative": ("CONDITIONING", ),
+                             "vae": ("VAE", ),
+                             "control_mask": ("MASK", ),
                              }
     }
 
@@ -259,16 +270,26 @@ class InfuseNetApply:
 
     CATEGORY = "infinite_you"
 
-    def apply_controlnet(self, positive, negative, id_embedding, control_net, image, strength, start_percent, end_percent, vae=None, extra_concat=[]):
+    def apply_controlnet(self, positive, id_embedding, control_net, image, strength, start_percent, end_percent, negative = None, vae=None, control_mask=None, extra_concat=[]):
         if strength == 0:
             return (positive, negative)
 
+        if control_mask is not None:
+            if control_mask.dim() > 3:
+                control_mask = control_mask.squeeze(-1)
+            elif control_mask.dim() < 3:
+                control_mask = control_mask.unsqueeze(0)
+
         control_hint = image.movedim(-1,1)
         cnets = {}
-
+        
         out = []
         for conditioning in [positive, negative]:
             c = []
+            if conditioning is None:
+                out.append(None)
+                continue
+
             for t in conditioning:
                 d = t[1].copy()
 
@@ -279,6 +300,7 @@ class InfuseNetApply:
                     c_net = control_net.copy().set_cond_hint(control_hint, strength, (start_percent, end_percent), vae=vae, extra_concat=extra_concat)
                     c_net.id_embedding = id_embedding['id_embedding']
                     c_net.set_previous_controlnet(prev_cnet)
+                    c_net.set_extra_arg("control_mask", control_mask)
                     cnets[prev_cnet] = c_net
 
                 d['control'] = c_net

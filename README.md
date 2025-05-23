@@ -24,9 +24,13 @@ This repository provides the official ComfyUI native node for [**InfiniteYou**](
 
 ## 🛠️ Workflow Example
 
-This node adds InfiniteYou‑FLUX support to ComfyUI. In the [examples folder](./examples/), you can find a simple workflow demonstrating its usage with either an empty face‑pose control image or a real face‑pose control image, configured to run using FLUX FP8 precision. It also shows an example running the node with FLUX.1-schnell.
+This node adds InfiniteYou‑FLUX support to ComfyUI. In [infinite_you_workflow.json](./examples/infinite_you_workflow.json), you can find a simple workflow demonstrating its usage with either an empty face‑pose control image or a real face‑pose control image, configured to run using FLUX FP8 precision. It also shows an example running the node with FLUX.1-schnell.
 
 ![basic workflow](examples/workflow.jpg)
+
+**Extension:** We also provide an example [multi-id workflow](examples/multi_id_infinite_you_workflow.json) for identity-preserved image generation of two people. This uses the masked multi-region test of single-ID InfiniteYou‑FLUX models with masked residual blending, and is provided for reference only.
+
+![basic workflow](examples/multi_id_workflow.jpg)
 
 
 ## 🔧 Requirements and Installation
@@ -56,7 +60,7 @@ The full-performance BF16 model inference requires a peak VRAM of around **43GB*
 
 1. Restart ComfyUI.
 
-2. Import the [workflow](examples/infinite_you_workflow.json) from the examples folder.
+2. Import the [workflow](examples/infinite_you_workflow.json) from the [examples folder](./examples). Please use [multi-id workflow](examples/multi_id_infinite_you_workflow.json) if needed.
 
 * Some [important usage tips](https://github.com/bytedance/InfiniteYou?tab=readme-ov-file#-important-usage-tips) can be found in our main InfiniteYou repository.
 
