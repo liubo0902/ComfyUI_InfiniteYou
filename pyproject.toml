@@ -1,7 +1,7 @@
 [project]
 name = "infiniteyou"
 description = "Official ComfyUI Support - InfiniteYou: Flexible Photo Recrafting While Preserving Your Identity"
-version = "1.0.0"
+version = "1.0.1"
 license = {file = "LICENSE"}
 dependencies = ["facexlib>=0.3.0", "onnxruntime>=1.19.2", "insightface>=0.7.3", "opencv-python>=4.11.0.86", "huggingface_hub"]
 
