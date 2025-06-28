@@ -1,4 +1,4 @@
-## Official ComfyUI Support - InfiniteYou: Flexible Photo Recrafting While Preserving Your Identity
+## Official ComfyUI Support - InfiniteYou: Flexible Photo Recrafting While Preserving Your Identity (ICCV 2025)
 
 <div align="center">
 
@@ -104,11 +104,10 @@ This research aims to positively impact the field of Generative AI. Any usage of
 If you find InfiniteYou useful for your research or applications, please cite our paper:
 
 ```bibtex
-@article{jiang2025infiniteyou,
+@inproceedings{jiang2025infiniteyou,
   title={{InfiniteYou}: Flexible Photo Recrafting While Preserving Your Identity},
   author={Jiang, Liming and Yan, Qing and Jia, Yumin and Liu, Zichuan and Kang, Hao and Lu, Xin},
-  journal={arXiv preprint},
-  volume={arXiv:2503.16418},
+  booktitle={ICCV},
   year={2025}
 }
 ```
