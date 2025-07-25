@@ -1,4 +1,4 @@
-## Official ComfyUI Support - InfiniteYou: Flexible Photo Recrafting While Preserving Your Identity (ICCV 2025)
+## Official ComfyUI Support - InfiniteYou: Flexible Photo Recrafting While Preserving Your Identity (ICCV 2025 Highlight)
 
 <div align="center">
 
@@ -10,7 +10,7 @@
 
 </div>
 
-This repository provides the official ComfyUI native node for [**InfiniteYou**](https://github.com/bytedance/InfiniteYou) with FLUX.
+This repository provides the official ComfyUI native node supporting [**InfiniteYou**](https://github.com/bytedance/InfiniteYou) with FLUX.
 
 ![teaser](examples/teaser.jpg)
 
