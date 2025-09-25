@@ -31,6 +31,7 @@ from .infuse_net import load_infuse_net_flux
 from .resampler import Resampler
 
 folder_paths.add_model_folder_path("infinite_you", os.path.join(folder_paths.models_dir, "infinite_you"))
+folder_paths.add_model_folder_path("infinite_you", os.path.join(folder_paths.cache_dir, "models/infinite_you"))
 
 class FaceDetector:
     def __init__(self, 
@@ -78,10 +79,12 @@ class IDEmbeddingModelLoader:
 
     def load_insightface(self, image_proj_model_name, image_proj_num_tokens, face_analysis_provider, face_analysis_det_size):
         insight_facedir = os.path.join(folder_paths.models_dir, "insightface")
+        if not os.path.exists(insight_facedir):
+            insight_facedir = os.path.join(folder_paths.cache_dir, "models/annotator/insightface")
 
         # Download insightface models
         antelopev2_dir = os.path.join(insight_facedir, 'models', 'antelopev2')
-        if not os.path.exists(antelopev2_dir) or len(glob.glob(os.path.join(antelopev2_dir, "*.onnx"))) == 0:
+        if not os.path.exists(antelopev2_dir)== 0:
             os.makedirs(antelopev2_dir, exist_ok=True)
             snapshot_download(repo_id="MonsterMMORPG/tools", allow_patterns="*.onnx", local_dir=antelopev2_dir)
 
@@ -89,13 +92,16 @@ class IDEmbeddingModelLoader:
         infinite_you_dir = os.path.join(folder_paths.models_dir, "infinite_you")
         image_proj_model_path = os.path.join(infinite_you_dir, image_proj_model_name)
         if not os.path.exists(image_proj_model_path):
-            dst_dir = os.path.dirname(image_proj_model_path)
-            os.makedirs(dst_dir, exist_ok=True)
+            if os.path.exists(os.path.join(folder_paths.cache_dir, "models/infinite_you", image_proj_model_name)):
+                image_proj_model_path = os.path.join(folder_paths.cache_dir, "models/infinite_you", image_proj_model_name)
+            else:
+                dst_dir = os.path.dirname(image_proj_model_path)
+                os.makedirs(dst_dir, exist_ok=True)
 
-            downloaded_file = hf_hub_download(repo_id="ByteDance/InfiniteYou", 
-                            filename=escape_path_for_url(os.path.join("infu_flux_v1.0", image_proj_model_name)),
-                            local_dir=infinite_you_dir)
-            shutil.move(downloaded_file, image_proj_model_path)
+                downloaded_file = hf_hub_download(repo_id="ByteDance/InfiniteYou", 
+                                filename=escape_path_for_url(os.path.join("infu_flux_v1.0", image_proj_model_name)),
+                                local_dir=infinite_you_dir)
+                shutil.move(downloaded_file, image_proj_model_path)
 
         provider = 'CPUExecutionProvider'
         if face_analysis_provider == 'CUDA':
@@ -235,13 +241,16 @@ class InfuseNetLoader:
         controlnet_path = os.path.join(infinite_you_dir, controlnet_name)
 
         if not os.path.exists(controlnet_path):
-            dst_dir = os.path.dirname(controlnet_path)
-            os.makedirs(dst_dir, exist_ok=True)
-            downloaded_file = hf_hub_download(repo_id="ByteDance/InfiniteYou", 
-                            filename=escape_path_for_url(os.path.join("infu_flux_v1.0", controlnet_name)),
-                            local_dir=infinite_you_dir)
-            
-            shutil.move(downloaded_file, controlnet_path)
+            if os.path.exists(os.path.join(folder_paths.cache_dir, "models/infinite_you", controlnet_name)):
+                controlnet_path = os.path.join(folder_paths.cache_dir, "models/infinite_you", controlnet_name)
+            else:
+                dst_dir = os.path.dirname(controlnet_path)
+                os.makedirs(dst_dir, exist_ok=True)
+                downloaded_file = hf_hub_download(repo_id="ByteDance/InfiniteYou", 
+                                filename=escape_path_for_url(os.path.join("infu_flux_v1.0", controlnet_name)),
+                                local_dir=infinite_you_dir)
+                
+                shutil.move(downloaded_file, controlnet_path)
         
         controlnet = load_infuse_net_flux(controlnet_path)
         return (controlnet,)
